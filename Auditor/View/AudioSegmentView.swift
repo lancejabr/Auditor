@@ -27,21 +27,18 @@ class AudioSegmentView: MTKView {
             // ...x coordinates
             let widthPerFrame = 2.0 / (Float32(buffer.frameLength) - 1)
             let t = (0..<Int(buffer.frameLength)).map { i in widthPerFrame * Float32(i) - 1 }
-            self.xCoords = self.device!.makeBuffer(bytes: t, length: Int(buffer.frameLength) * MemoryLayout<Float32>.size, options: .storageModePrivate)
+            self.xCoords = self.device!.makeBuffer(bytes: t, length: Int(buffer.frameLength) * MemoryLayout<Float32>.size, options: .storageModeShared)
             
             // ...y coordinates
-            self.yCoords = self.device!.makeBuffer(bytes: buffer.floatChannelData![0], length: Int(buffer.frameLength) * MemoryLayout<Float32>.size, options: .storageModePrivate)
-            
-            // create memory for a color buffer
-            self.colorBuffer = self.device!.makeBuffer(length: 4 * MemoryLayout<Float32>.size, options: .storageModePrivate)
+            self.yCoords = self.device!.makeBuffer(bytes: buffer.floatChannelData![0], length: Int(buffer.frameLength) * MemoryLayout<Float32>.size, options: .storageModeShared)
             
             // create the memory for the border
             // we can make the X coordinates now
             let borderX: [Float] = [-1, 1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1]
-            self.borderX = self.device!.makeBuffer(bytes: borderX, length: 12 * MemoryLayout<Float>.size, options: .storageModePrivate)
+            self.borderX = self.device!.makeBuffer(bytes: borderX, length: 12 * MemoryLayout<Float>.size, options: .storageModeShared)
             
             // we can allocate memory for Y coordinates but we'll fill in values later
-            self.borderY = self.device!.makeBuffer(length: 12 * MemoryLayout<Float32>.size, options: .storageModePrivate)
+            self.borderY = self.device!.makeBuffer(length: 12 * MemoryLayout<Float32>.size, options: .storageModeShared)
             
             // render the audio
             self.needsDisplay = true
@@ -65,9 +62,6 @@ class AudioSegmentView: MTKView {
     
     /// the matrix used to scale and translate the audio waveform
     var transformBuffer: MTLBuffer?
-    
-    /// pass a rgba color to a fragment shader
-    var colorBuffer: MTLBuffer?
     
     
     // MARK: Instance Methods
@@ -126,10 +120,7 @@ class AudioSegmentView: MTKView {
         // TODO: optimize using inLiveResize
         //        if self.inLiveResize {Swift.print("resize");return} else {Swift.print("not resize")}
         
-        guard let buffer = self.audioSegment?.buffer else {
-            Swift.print("Maybe we don't have an audio segment?")
-            return
-        }
+        guard let buffer = self.audioSegment?.buffer else { return }
         
         // if something's up with Metal we can't do anything
         guard
@@ -139,13 +130,12 @@ class AudioSegmentView: MTKView {
             let defaultPipelineState = self.defaultPipelineState,
             let borderRenderPassDescriptor = self.borderRenderPassDescriptor
             else {
-                Swift.print("Metal is not set up properly")
+                fail(desc: "Metal is not set up properly")
                 return
         }
         
         // assemble the color buffer
         let colorBuffer: [Float32] = [0.25, 0.35, 0.5, 1]
-        memcpy(self.colorBuffer!.contents(), colorBuffer, 4 * MemoryLayout<Float32>.size)
         
         // create the command buffer
         let commandBuffer = device.makeCommandQueue()!.makeCommandBuffer()!
@@ -156,7 +146,8 @@ class AudioSegmentView: MTKView {
         // attach resources
         commandEncoder.setVertexBuffer(self.xCoords, offset: 0, index: 0) // x coords of waveform
         commandEncoder.setVertexBuffer(self.yCoords, offset: 0, index: 1) // y coords of waveform
-        commandEncoder.setFragmentBuffer(self.colorBuffer, offset: 0, index: 0) // color of waveform
+//        commandEncoder.setFragmentBuffer(self.colorBuffer, offset: 0, index: 0) // color of waveform
+        commandEncoder.setFragmentBytes(colorBuffer, length: colorBuffer.count * MemoryLayout<Float32>.size, index: 0) // color of waveform
         // draw the waveform as a linestrip
         commandEncoder.drawPrimitives(type: .lineStrip, vertexStart: 0, vertexCount: Int(buffer.frameLength))
         commandEncoder.drawPrimitives(type: .point,
@@ -169,25 +160,25 @@ class AudioSegmentView: MTKView {
         // 2 - encode a rendering pass for the view borders
         
         // create the y coordinates
-        let height = Float(self.bounds.size.height)
-        let borderWidth: Float = 3
-        let normalizedBorderWidth = 2 * borderWidth / height
-        let borderY: [Float] = [1, 1, 1 - normalizedBorderWidth,
-                                1 - normalizedBorderWidth, 1, 1 - normalizedBorderWidth,
-                                -1 + normalizedBorderWidth, -1 + normalizedBorderWidth, -1,
-                                -1, -1 + normalizedBorderWidth, -1]
-        memcpy(self.borderY!.contents(), borderY, 12 * MemoryLayout<Float>.size)
+//        let height = Float(self.bounds.size.height)
+//        let borderWidth: Float = 3
+//        let normalizedBorderWidth = 2 * borderWidth / height
+//        let borderY: [Float] = [1, 1, 1 - normalizedBorderWidth,
+//                                1 - normalizedBorderWidth, 1, 1 - normalizedBorderWidth,
+//                                -1 + normalizedBorderWidth, -1 + normalizedBorderWidth, -1,
+//                                -1, -1 + normalizedBorderWidth, -1]
+//        memcpy(self.borderY!.contents(), borderY, 12 * MemoryLayout<Float>.size)
         
         // create the render pass
-        borderRenderPassDescriptor.colorAttachments[0].texture = currentDrawable.texture
-        let commandEncoder2 = commandBuffer.makeRenderCommandEncoder(descriptor: borderRenderPassDescriptor)!
-        commandEncoder2.setRenderPipelineState(defaultPipelineState)
-        // attach resources
-        commandEncoder2.setVertexBuffer(self.borderX, offset: 0, index: 0) // x coords of border
-        commandEncoder2.setVertexBuffer(self.borderY, offset: 0, index: 1) // y coords of border
-        commandEncoder2.setFragmentBuffer(self.colorBuffer, offset:0, index:0)
-        commandEncoder2.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 12)
-        commandEncoder2.endEncoding()
+//        borderRenderPassDescriptor.colorAttachments[0].texture = currentDrawable.texture
+//        let commandEncoder2 = commandBuffer.makeRenderCommandEncoder(descriptor: borderRenderPassDescriptor)!
+//        commandEncoder2.setRenderPipelineState(defaultPipelineState)
+//        // attach resources
+//        commandEncoder2.setVertexBuffer(self.borderX, offset: 0, index: 0) // x coords of border
+//        commandEncoder2.setVertexBuffer(self.borderY, offset: 0, index: 1) // y coords of border
+//        commandEncoder2.setFragmentBuffer(self.colorBuffer, offset:0, index:0)
+//        commandEncoder2.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 12)
+//        commandEncoder2.endEncoding()
         
         
         // commit the buffer for rendering
