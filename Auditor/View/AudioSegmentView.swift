@@ -134,8 +134,6 @@ class AudioSegmentView: MTKView {
                 return
         }
         
-        // assemble the color buffer
-        let colorBuffer: [Float32] = [0.25, 0.35, 0.5, 1]
         
         // create the command buffer
         let commandBuffer = device.makeCommandQueue()!.makeCommandBuffer()!
@@ -146,7 +144,7 @@ class AudioSegmentView: MTKView {
         // attach resources
         commandEncoder.setVertexBuffer(self.xCoords, offset: 0, index: 0) // x coords of waveform
         commandEncoder.setVertexBuffer(self.yCoords, offset: 0, index: 1) // y coords of waveform
-//        commandEncoder.setFragmentBuffer(self.colorBuffer, offset: 0, index: 0) // color of waveform
+        let colorBuffer: [Float32] = [0.25, 0.35, 0.5, 1]
         commandEncoder.setFragmentBytes(colorBuffer, length: colorBuffer.count * MemoryLayout<Float32>.size, index: 0) // color of waveform
         // draw the waveform as a linestrip
         commandEncoder.drawPrimitives(type: .lineStrip, vertexStart: 0, vertexCount: Int(buffer.frameLength))
