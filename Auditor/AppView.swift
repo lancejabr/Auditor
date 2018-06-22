@@ -56,7 +56,6 @@ class AppView: NSView {
     
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
         if let url = fileURLFor(drag: sender) {
-            //TODO: Use the file
             if let audSegView = self.subviews.first as? AudioSegmentView {
                 audSegView.audioSegment = AudioSegment(fileURL: url)
             }
@@ -68,6 +67,15 @@ class AppView: NSView {
     
     override func concludeDragOperation(_ sender: NSDraggingInfo?) {}
     
+    // - MARK: - Zooming
+    
+    @IBAction func handleGesture(gestureRecognizer: NSMagnificationGestureRecognizer) {
+        Swift.print(gestureRecognizer.magnification)
+        let scrollView = self.subviews.first as! NSScrollView
+        
+        scrollView.
+        
+    }
 //    var hairlineBorderFrame: NSRect {
 //        return CGRectMake(headerViewWidth - hairlineWidth, 0, hairlineWidth, self.bounds.size.height)
 //    }
@@ -78,5 +86,9 @@ class AppView: NSView {
 //        NSColor(calibratedWhite: 0.9, alpha: 1).set()
 //        NSBezierPath.fill(rect: hairlineBorderFrame)
 //    }
+    
+}
+
+extension AppView: NSGestureRecognizerDelegate {
     
 }

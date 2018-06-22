@@ -12,7 +12,7 @@ import MetalKit
 import AVFoundation
 
 /// A view that renders an audio signal using Metal
-class AudioSegmentView: MTKView {
+class AudioSegmentView: MTKView, MTKViewDelegate {
     
     // MARK: Audio Properties
     
@@ -95,13 +95,12 @@ class AudioSegmentView: MTKView {
         let defaultPipelineDescriptor = MTLRenderPipelineDescriptor()
         defaultPipelineDescriptor.vertexFunction = defaultLibrary.makeFunction(name: "xy_vertex")
         defaultPipelineDescriptor.fragmentFunction = defaultLibrary.makeFunction(name: "solid_color")
-        defaultPipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+        defaultPipelineDescriptor.colorAttachments[0].pixelFormat = self.colorPixelFormat
         self.defaultPipelineState = try? self.device!.makeRenderPipelineState(descriptor: defaultPipelineDescriptor)
     }
     
-    /// Overrides NSView.init
     required init(frame: NSRect) {
-        super.init(frame: frame, device: MTLCreateSystemDefaultDevice())
+        super.init(frame: frame, device: nil)
         
         self.setup()
     }
@@ -115,9 +114,10 @@ class AudioSegmentView: MTKView {
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
-        // TODO: optimize using dirtyRect
+        // TODO: optimize using rect
         
         // TODO: optimize using inLiveResize
+
         //        if self.inLiveResize {Swift.print("resize");return} else {Swift.print("not resize")}
         
         guard let buffer = self.audioSegment?.buffer else { return }
@@ -182,6 +182,11 @@ class AudioSegmentView: MTKView {
         // commit the buffer for rendering
         commandBuffer.present(currentDrawable)
         commandBuffer.commit()
+    }
+    
+    func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+        // TODO
+        Swift.print("RESIZE")
     }
 }
 
