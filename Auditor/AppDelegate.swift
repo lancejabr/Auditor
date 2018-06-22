@@ -8,6 +8,13 @@
 
 import Cocoa
 
+func fail(desc: String) {
+    #if DEBUG
+    print("assertFail:\(desc)")
+    raise(SIGINT)
+    #endif
+}
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
