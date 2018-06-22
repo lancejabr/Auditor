@@ -27,21 +27,21 @@ class AudioSegmentView: MTKView {
             // ...x coordinates
             let widthPerFrame = 2.0 / (Float32(buffer.frameLength) - 1)
             let t = (0..<Int(buffer.frameLength)).map { i in widthPerFrame * Float32(i) - 1 }
-            self.xCoords = self.device!.makeBuffer(bytes: t, length: Int(buffer.frameLength) * MemoryLayout<Float32>.size, options: .storageModeShared)
+            self.xCoords = self.device!.makeBuffer(bytes: t, length: Int(buffer.frameLength) * MemoryLayout<Float32>.size, options: .storageModePrivate)
             
             // ...y coordinates
-            self.yCoords = self.device!.makeBuffer(bytes: buffer.floatChannelData![0], length: Int(buffer.frameLength) * MemoryLayout<Float32>.size, options: .storageModeShared)
+            self.yCoords = self.device!.makeBuffer(bytes: buffer.floatChannelData![0], length: Int(buffer.frameLength) * MemoryLayout<Float32>.size, options: .storageModePrivate)
             
             // create memory for a color buffer
-            self.colorBuffer = self.device!.makeBuffer(length: 4 * MemoryLayout<Float32>.size, options: .storageModeShared)
+            self.colorBuffer = self.device!.makeBuffer(length: 4 * MemoryLayout<Float32>.size, options: .storageModePrivate)
             
             // create the memory for the border
             // we can make the X coordinates now
             let borderX: [Float] = [-1, 1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1]
-            self.borderX = self.device!.makeBuffer(bytes: borderX, length: 12 * MemoryLayout<Float>.size, options: .storageModeShared)
+            self.borderX = self.device!.makeBuffer(bytes: borderX, length: 12 * MemoryLayout<Float>.size, options: .storageModePrivate)
             
             // we can allocate memory for Y coordinates but we'll fill in values later
-            self.borderY = self.device!.makeBuffer(length: 12 * MemoryLayout<Float32>.size, options: .storageModeShared)
+            self.borderY = self.device!.makeBuffer(length: 12 * MemoryLayout<Float32>.size, options: .storageModePrivate)
             
             // render the audio
             self.needsDisplay = true
