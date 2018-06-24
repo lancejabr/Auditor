@@ -125,7 +125,7 @@ class AudioRoute {
                                                      mScope: kAudioObjectPropertyScopeGlobal,
                                                      mElement: kAudioObjectPropertyElementMaster)
         
-        let err = AudioObjectGetPropertyDataSize(
+        AudioObjectGetPropertyDataSize(
             AudioObjectID(kAudioObjectSystemObject), // object to query
             &propAddress, // property to query
             0, nil, // qualification
