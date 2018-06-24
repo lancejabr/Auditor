@@ -706,41 +706,23 @@
             <objects>
                 <viewController id="5gI-5U-AMq" customClass="ViewController" customModule="Auditor" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="ERx-hH-rdd">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                        <rect key="frame" x="0.0" y="0.0" width="615" height="345"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="GnB-TN-PP0" customClass="AppView" customModule="Auditor" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                                <rect key="frame" x="0.0" y="0.0" width="615" height="345"/>
                                 <subviews>
-                                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" horizontalScrollElasticity="allowed" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="gvG-Vr-Hp7" customClass="TracksScrollView" customModule="Auditor" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="20" width="480" height="250"/>
-                                        <clipView key="contentView" id="ZEp-WN-oxl">
-                                            <rect key="frame" x="0.0" y="0.0" width="465" height="235"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <subviews>
-                                                <view fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kea-GI-3zw">
-                                                    <rect key="frame" x="0.0" y="0.0" width="450" height="220"/>
-                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                </view>
-                                            </subviews>
-                                        </clipView>
-                                        <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="oyt-nk-zdD">
-                                            <rect key="frame" x="0.0" y="235" width="465" height="15"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </scroller>
-                                        <scroller key="verticalScroller" verticalHuggingPriority="750" arrowsPosition="none" doubleValue="1" horizontal="NO" id="tZC-vJ-oDj">
-                                            <rect key="frame" x="465" y="0.0" width="15" height="235"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </scroller>
-                                    </scrollView>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="3ed-YI-D17" customClass="LiveWaveformView" customModule="Auditor" customModuleProvider="target">
+                                        <rect key="frame" x="20" y="20" width="575" height="305"/>
+                                    </customView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="gvG-Vr-Hp7" firstAttribute="top" secondItem="GnB-TN-PP0" secondAttribute="top" id="Qxg-6W-Dq8"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="270" id="Ue7-8a-F0A"/>
-                                    <constraint firstItem="gvG-Vr-Hp7" firstAttribute="leading" secondItem="GnB-TN-PP0" secondAttribute="leading" id="aAt-02-vpH"/>
-                                    <constraint firstAttribute="bottom" secondItem="gvG-Vr-Hp7" secondAttribute="bottom" constant="20" id="cVg-yr-5aM"/>
+                                    <constraint firstItem="3ed-YI-D17" firstAttribute="top" secondItem="GnB-TN-PP0" secondAttribute="top" constant="20" id="CCw-Cz-p50"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="345" id="EWn-S3-VTB"/>
+                                    <constraint firstAttribute="trailing" secondItem="3ed-YI-D17" secondAttribute="trailing" constant="20" id="ZZD-jF-NT8"/>
+                                    <constraint firstAttribute="bottom" secondItem="3ed-YI-D17" secondAttribute="bottom" constant="20" id="c2m-Oc-p5q"/>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="480" id="dcD-vB-By7"/>
-                                    <constraint firstAttribute="trailing" secondItem="gvG-Vr-Hp7" secondAttribute="trailing" id="hbh-Hv-Svn"/>
+                                    <constraint firstItem="3ed-YI-D17" firstAttribute="leading" secondItem="GnB-TN-PP0" secondAttribute="leading" constant="20" id="eZy-bY-q3o"/>
                                 </constraints>
                                 <gestureRecognizers>
                                     <magnificationGestureRecognizer delaysMagnificationEvents="YES" magnification="0.0" id="IoM-0p-778">
@@ -764,7 +746,7 @@
                 </viewController>
                 <customObject id="2Tp-Fl-jBw" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="643"/>
+            <point key="canvasLocation" x="142.5" y="706.5"/>
         </scene>
     </scenes>
 </document>

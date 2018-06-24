@@ -32,5 +32,5 @@ fragment float4 solid_color(const device float4 &color [[ buffer(0) ]]) {
 }
 
 fragment float4 per_vertex(Vertex v [[stage_in]]) {
-    return v.position.x
+    return v.position.x;
 }

@@ -188,6 +188,10 @@ class AudioSegmentView: MTKView, MTKViewDelegate {
         // TODO
         Swift.print("RESIZE")
     }
+    
+    func draw(in view: MTKView) {
+        
+    }
 }
 
 protocol AudioSegmentViewDelegate {

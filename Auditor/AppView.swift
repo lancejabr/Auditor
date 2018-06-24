@@ -17,7 +17,7 @@ class AppView: NSView {
         
         self.wantsLayer = true
         self.layer!.isOpaque = true
-        self.layer!.backgroundColor = NSColor.white.cgColor
+        self.layer!.backgroundColor = NSColor.windowBackgroundColor.cgColor
         
         self.registerForDraggedTypes([.fileURL])
         self.allowedTouchTypes = [.direct, .indirect]
@@ -73,7 +73,7 @@ class AppView: NSView {
         Swift.print(gestureRecognizer.magnification)
         let scrollView = self.subviews.first as! NSScrollView
         
-        scrollView.
+//        scrollView.
         
     }
 //    var hairlineBorderFrame: NSRect {

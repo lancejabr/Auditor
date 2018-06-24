@@ -15,4 +15,5 @@ class TracksScrollView: NSScrollView {
         super.init(coder: coder)
     }
     
+    var horizontalZoom: CGFloat = 1
 }
