@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import AVFoundation
 
 class ViewController: NSViewController {
     
@@ -16,13 +17,20 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         
         AudioRoute.onDevicesChanged = {
-            self.audioEngine = AudioEngine()
             self.inputTable.reloadData()
             self.outputTable.reloadData()
             self.setTableSelection()
+            self.audioEngine = AudioEngine()
+            self.audioEngine.inputNode.installTap(onBus: 0, bufferSize: AVAudioFrameCount(self.inputAudioView.fftSize), format: nil) { buffer, time in
+                self.inputAudioView.addAudioData(buffer)
+            }
         }
         
+        
         setTableSelection()
+        self.audioEngine.inputNode.installTap(onBus: 0, bufferSize: AVAudioFrameCount(self.inputAudioView.fftSize), format: nil) { buffer, time in
+            self.inputAudioView.addAudioData(buffer)
+        }
     }
 
     override var representedObject: Any? {
@@ -33,6 +41,9 @@ class ViewController: NSViewController {
 
     @IBOutlet var inputTable: NSTableView!
     @IBOutlet var outputTable: NSTableView!
+    
+    @IBOutlet var inputAudioView: LiveAudioView!
+    @IBOutlet var outputAudioView: LiveAudioView!
 
     fileprivate func setTableSelection() {
         let inputI = AudioRoute.availableInputs.index(of: AudioRoute.currentInput)

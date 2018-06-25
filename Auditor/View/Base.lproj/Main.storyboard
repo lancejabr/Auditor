@@ -706,7 +706,7 @@
             <objects>
                 <viewController id="5gI-5U-AMq" customClass="ViewController" customModule="Auditor" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="ERx-hH-rdd">
-                        <rect key="frame" x="0.0" y="0.0" width="615" height="345"/>
+                        <rect key="frame" x="0.0" y="0.0" width="863" height="450"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="10" verticalLineScroll="65" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9MI-Dl-blm">
@@ -849,39 +849,44 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
-                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VXg-sb-afR">
-                                <rect key="frame" x="18" y="301" width="245" height="26"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Item 3" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" preferredEdge="minX" selectedItem="AUX-3G-6Ot" id="u6P-Wt-ELe">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
-                                    <menu key="menu" id="OM3-Dg-mG6">
-                                        <items>
-                                            <menuItem title="Item 1" id="Rff-Tz-jQ9"/>
-                                            <menuItem title="Item 2" id="EQ4-BM-4oD"/>
-                                            <menuItem title="Item 3" state="on" id="AUX-3G-6Ot"/>
-                                        </items>
-                                    </menu>
-                                </popUpButtonCell>
-                            </popUpButton>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="QcK-Qb-fbJ" customClass="LiveAudioView" customModule="Auditor" customModuleProvider="target">
+                                <rect key="frame" x="344" y="20" width="499" height="200"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="200" id="AUe-P3-R7H"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="Lr3-Hl-EoJ"/>
+                                </constraints>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="oWa-bT-x9E" customClass="LiveAudioView" customModule="Auditor" customModuleProvider="target">
+                                <rect key="frame" x="344" y="230" width="499" height="200"/>
+                            </customView>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="QcK-Qb-fbJ" secondAttribute="trailing" constant="20" id="8vg-Qn-rVS"/>
                             <constraint firstItem="XUX-XA-d16" firstAttribute="leading" secondItem="9MI-Dl-blm" secondAttribute="trailing" constant="8" id="B3Y-yF-iNc"/>
+                            <constraint firstItem="QcK-Qb-fbJ" firstAttribute="leading" secondItem="XUX-XA-d16" secondAttribute="trailing" constant="16" id="CZT-8w-x11"/>
                             <constraint firstItem="9MI-Dl-blm" firstAttribute="leading" secondItem="ERx-hH-rdd" secondAttribute="leading" constant="20" id="Fi2-gH-R9E"/>
+                            <constraint firstItem="oWa-bT-x9E" firstAttribute="height" secondItem="QcK-Qb-fbJ" secondAttribute="height" id="JfT-ga-gkY"/>
+                            <constraint firstItem="oWa-bT-x9E" firstAttribute="trailing" secondItem="QcK-Qb-fbJ" secondAttribute="trailing" id="KZe-KG-hW8"/>
+                            <constraint firstAttribute="bottom" secondItem="QcK-Qb-fbJ" secondAttribute="bottom" constant="20" id="Ofd-sh-AGX"/>
                             <constraint firstItem="XUX-XA-d16" firstAttribute="bottom" secondItem="9MI-Dl-blm" secondAttribute="bottom" id="Rml-oY-ahP"/>
+                            <constraint firstItem="oWa-bT-x9E" firstAttribute="leading" secondItem="QcK-Qb-fbJ" secondAttribute="leading" id="S8j-16-rB5"/>
                             <constraint firstItem="XUX-XA-d16" firstAttribute="top" secondItem="9MI-Dl-blm" secondAttribute="top" id="TqV-Gk-XV2"/>
                             <constraint firstAttribute="bottom" secondItem="9MI-Dl-blm" secondAttribute="bottom" constant="20" id="ahI-VU-9Vf"/>
+                            <constraint firstItem="oWa-bT-x9E" firstAttribute="top" secondItem="ERx-hH-rdd" secondAttribute="top" constant="20" id="ayV-tW-lO2"/>
                             <constraint firstItem="XUX-XA-d16" firstAttribute="width" secondItem="9MI-Dl-blm" secondAttribute="width" id="k0T-XC-kWP"/>
+                            <constraint firstItem="QcK-Qb-fbJ" firstAttribute="top" secondItem="oWa-bT-x9E" secondAttribute="bottom" constant="10" id="nBc-KX-hmv"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="inputAudioView" destination="oWa-bT-x9E" id="eFB-T1-ytc"/>
                         <outlet property="inputTable" destination="rUH-A5-IM2" id="ZWw-cj-oWb"/>
+                        <outlet property="outputAudioView" destination="QcK-Qb-fbJ" id="w3x-5U-hb6"/>
                         <outlet property="outputTable" destination="psM-zK-6Mn" id="slS-qZ-fYP"/>
                     </connections>
                 </viewController>
                 <customObject id="2Tp-Fl-jBw" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="142.5" y="706.5"/>
+            <point key="canvasLocation" x="266.5" y="737"/>
         </scene>
     </scenes>
 </document>

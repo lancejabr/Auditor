@@ -19,18 +19,16 @@ class AudioEngine: AVAudioEngine {
             let url = Bundle.main.url(forResource: "claire-mid", withExtension: "aif")!
             let file = try AVAudioFile(forReading: url)
 
-            self.attach(player)
-            self.connect(self.player, to: self.mainMixerNode, format: file.processingFormat)
-            player.scheduleFile(file, at: nil, completionCallbackType: .dataPlayedBack, completionHandler: nil)
-            
-//            self.inputNode.installTap(onBus: 0, bufferSize: 8192, format: self.inputNode.outputFormat(forBus: 0)) { buffer, time in
-//                Swift.print(buffer.frameLength)
-//            }
-//            self.connect(self.inputNode, to: self.mainMixerNode, format: nil)
+//            self.attach(player)
+//            self.connect(self.player, to: self.mainMixerNode, format: file.processingFormat)
+//            player.scheduleFile(file, at: nil, completionCallbackType: .dataPlayedBack, completionHandler: nil)
             
 
+            self.connect(self.inputNode, to: self.mainMixerNode, format: nil)
+
+
             try self.start()
-            player.play()
+//            player.play()
 
         } catch {
             fail(desc: "Could not start audio engine!")

@@ -26,9 +26,9 @@
 		750FB72520DC552800526B50 /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB72220DC552800526B50 /* AppView.swift */; };
 		750FB72E20DCCFB400526B50 /* TracksScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB72D20DCCFB400526B50 /* TracksScrollView.swift */; };
 		750FB73020DDC6AB00526B50 /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB72F20DDC6AB00526B50 /* AudioEngine.swift */; };
-		750FB73420DF106200526B50 /* LiveWaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB73320DF106200526B50 /* LiveWaveformView.swift */; };
-		750FB73520DF106200526B50 /* LiveWaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB73320DF106200526B50 /* LiveWaveformView.swift */; };
-		750FB73620DF106200526B50 /* LiveWaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB73320DF106200526B50 /* LiveWaveformView.swift */; };
+		750FB73420DF106200526B50 /* LiveAudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB73320DF106200526B50 /* LiveAudioView.swift */; };
+		750FB73520DF106200526B50 /* LiveAudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB73320DF106200526B50 /* LiveAudioView.swift */; };
+		750FB73620DF106200526B50 /* LiveAudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB73320DF106200526B50 /* LiveAudioView.swift */; };
 		750FB74920DF69FC00526B50 /* AudioRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB74520DF3FBD00526B50 /* AudioRoute.swift */; };
 		750FB74A20DF69FD00526B50 /* AudioRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB74520DF3FBD00526B50 /* AudioRoute.swift */; };
 		750FB74B20DF69FE00526B50 /* AudioRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB74520DF3FBD00526B50 /* AudioRoute.swift */; };
@@ -73,7 +73,7 @@
 		750FB72220DC552800526B50 /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
 		750FB72D20DCCFB400526B50 /* TracksScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksScrollView.swift; sourceTree = "<group>"; };
 		750FB72F20DDC6AB00526B50 /* AudioEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngine.swift; sourceTree = "<group>"; };
-		750FB73320DF106200526B50 /* LiveWaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveWaveformView.swift; sourceTree = "<group>"; };
+		750FB73320DF106200526B50 /* LiveAudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveAudioView.swift; sourceTree = "<group>"; };
 		750FB73720DF3C3000526B50 /* Auditor-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auditor-Bridging-Header.h"; sourceTree = "<group>"; };
 		750FB73820DF3C3000526B50 /* AuditorTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AuditorTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		750FB73920DF3C3000526B50 /* AuditorUITests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AuditorUITests-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -170,7 +170,7 @@
 				750FB71620DC42D800526B50 /* AudioSegmentView.swift */,
 				750FB71A20DC42FB00526B50 /* shaders.metal */,
 				750FB72D20DCCFB400526B50 /* TracksScrollView.swift */,
-				750FB73320DF106200526B50 /* LiveWaveformView.swift */,
+				750FB73320DF106200526B50 /* LiveAudioView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -337,7 +337,7 @@
 				750FB71F20DC42FB00526B50 /* AudioSegment.swift in Sources */,
 				750FB74920DF69FC00526B50 /* AudioRoute.swift in Sources */,
 				750FB6EB20DC420E00526B50 /* ViewController.swift in Sources */,
-				750FB73420DF106200526B50 /* LiveWaveformView.swift in Sources */,
+				750FB73420DF106200526B50 /* LiveAudioView.swift in Sources */,
 				750FB71C20DC42FB00526B50 /* shaders.metal in Sources */,
 				750FB72E20DCCFB400526B50 /* TracksScrollView.swift in Sources */,
 				750FB72320DC552800526B50 /* AppView.swift in Sources */,
@@ -355,7 +355,7 @@
 				750FB71820DC42D800526B50 /* AudioSegmentView.swift in Sources */,
 				750FB74A20DF69FD00526B50 /* AudioRoute.swift in Sources */,
 				750FB72420DC552800526B50 /* AppView.swift in Sources */,
-				750FB73520DF106200526B50 /* LiveWaveformView.swift in Sources */,
+				750FB73520DF106200526B50 /* LiveAudioView.swift in Sources */,
 				750FB71D20DC42FB00526B50 /* shaders.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -368,7 +368,7 @@
 				750FB71920DC42D800526B50 /* AudioSegmentView.swift in Sources */,
 				750FB74B20DF69FE00526B50 /* AudioRoute.swift in Sources */,
 				750FB72520DC552800526B50 /* AppView.swift in Sources */,
-				750FB73620DF106200526B50 /* LiveWaveformView.swift in Sources */,
+				750FB73620DF106200526B50 /* LiveAudioView.swift in Sources */,
 				750FB71E20DC42FB00526B50 /* shaders.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

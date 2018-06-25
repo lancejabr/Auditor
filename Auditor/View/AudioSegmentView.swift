@@ -155,29 +155,6 @@ class AudioSegmentView: MTKView, MTKViewDelegate {
         commandEncoder.endEncoding()
         
         
-        // 2 - encode a rendering pass for the view borders
-        
-        // create the y coordinates
-//        let height = Float(self.bounds.size.height)
-//        let borderWidth: Float = 3
-//        let normalizedBorderWidth = 2 * borderWidth / height
-//        let borderY: [Float] = [1, 1, 1 - normalizedBorderWidth,
-//                                1 - normalizedBorderWidth, 1, 1 - normalizedBorderWidth,
-//                                -1 + normalizedBorderWidth, -1 + normalizedBorderWidth, -1,
-//                                -1, -1 + normalizedBorderWidth, -1]
-//        memcpy(self.borderY!.contents(), borderY, 12 * MemoryLayout<Float>.size)
-        
-        // create the render pass
-//        borderRenderPassDescriptor.colorAttachments[0].texture = currentDrawable.texture
-//        let commandEncoder2 = commandBuffer.makeRenderCommandEncoder(descriptor: borderRenderPassDescriptor)!
-//        commandEncoder2.setRenderPipelineState(defaultPipelineState)
-//        // attach resources
-//        commandEncoder2.setVertexBuffer(self.borderX, offset: 0, index: 0) // x coords of border
-//        commandEncoder2.setVertexBuffer(self.borderY, offset: 0, index: 1) // y coords of border
-//        commandEncoder2.setFragmentBuffer(self.colorBuffer, offset:0, index:0)
-//        commandEncoder2.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 12)
-//        commandEncoder2.endEncoding()
-        
         
         // commit the buffer for rendering
         commandBuffer.present(currentDrawable)
@@ -194,6 +171,3 @@ class AudioSegmentView: MTKView, MTKViewDelegate {
     }
 }
 
-protocol AudioSegmentViewDelegate {
-    
-}
