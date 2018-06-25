@@ -199,6 +199,9 @@ class AudioRoute {
                 &PropertyAddresses.allDevices,
                 nil) { numAddresses, addresses in
                     refreshDevices()
+                    DispatchQueue.main.async {
+                        AudioRoute.onDevicesChanged?()
+                    }
             }
         }
         
@@ -212,4 +215,6 @@ class AudioRoute {
     static var availableOutputs: [AudioObject] {
         return availableDevices.filter() { $0.isOutput }
     }
+    
+    static var onDevicesChanged: (() -> Void)?
 }
