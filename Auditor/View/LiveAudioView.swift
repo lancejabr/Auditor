@@ -13,29 +13,25 @@ import AVFoundation
 
 /// A view that renders an audio signal using Metal
 class LiveAudioView: MTKView {
-    
+
     let fftSize: Int = 2048
     var fftBuffer = UnsafeMutablePointer<Float>.allocate(capacity: 0)
+//    var fftMagBuffer = UnsafeMutablePointer<Float>.allocate(capacity: <#T##Int#>)
     var fftOffset: Int = 0
     
-    let pointsPerColumn: Int = 3
+    
+    let pointsPerColumn: Int = 2
     
     let dataSize = MemoryLayout<Float>.stride
     
     var audioData: MTLBuffer?
     var nBuffers: Int = 0
-    var lastBufferOffset: Int = 0
+    var bufferOffset: Int = -1
     
     override func viewDidEndLiveResize() {
         self.setup()
-        self.isPaused = false
+        self.needsDisplay = true
     }
-    
-    override func viewWillStartLiveResize() {
-        self.isPaused = true
-        
-    }
-    
     
     // MARK: Metal Resources
     
@@ -65,8 +61,9 @@ class LiveAudioView: MTKView {
         self.colorPixelFormat = .bgra8Unorm
         self.clearColor = MTLClearColorMake(1, 1, 1, 1)
         
-        self.preferredFramesPerSecond = 30
-        self.isPaused = false
+//        self.preferredFramesPerSecond = 30
+        self.isPaused = true
+        self.enableSetNeedsDisplay = true
         
         // prepare render pass descriptor for border, which needs to specific the .load loadAction
         self.borderRenderPassDescriptor = MTLRenderPassDescriptor()
@@ -88,33 +85,47 @@ class LiveAudioView: MTKView {
         // allocate space for audio
         self.nBuffers = Int(self.frame.width) / self.pointsPerColumn
         self.audioData = self.device!.makeBuffer(length: self.dataSize * self.fftSize * nBuffers, options: .storageModeShared)
-        self.lastBufferOffset = -1
+        self.bufferOffset = self.nBuffers
         
         // allocate space to perform FFT
+        self.fftBuffer.deallocate()
         self.fftBuffer = UnsafeMutablePointer<Float>.allocate(capacity: self.fftSize)
+        self.fftBuffer.initialize(repeating: 0, count: self.fftSize)
         self.fftOffset = 0
     }
     
     func addAudioData(_ buffer: AVAudioPCMBuffer) {
         
+//        self.bufferOffset -= 1
+//        if self.bufferOffset == -1 { self.bufferOffset = self.nBuffers - 1 }
+//        let target = self.audioData?.contents().assumingMemoryBound(to: Float.self).advanced(by: self.bufferOffset * self.fftSize)
+//        target?.assign(repeating: Float(self.nBuffers - self.bufferOffset) / Float(self.nBuffers), count: self.fftSize)
+//        DispatchQueue.main.async {
+//            if !self.inLiveResize {
+//                self.needsDisplay = true
+//            }
+//        }
         if self.audioData == nil { return }
-        if self.isPaused { return }
-        
+
         var framesLeft = Int(buffer.frameLength)
-        
+
         while framesLeft > 0 {
             let framesToCopy = Swift.min(self.fftSize - fftOffset, framesLeft)
             self.fftBuffer.advanced(by: fftOffset).assign(from: buffer.floatChannelData![0], count: framesToCopy)
             fftOffset += framesToCopy
             framesLeft -= framesToCopy
-            
+
             if fftOffset == self.fftSize {
                 // TODO: FFT ETC :)
-                self.lastBufferOffset += 1
-                if self.lastBufferOffset == nBuffers { self.lastBufferOffset = 0 }
-                let target = self.audioData?.contents().advanced(by: self.lastBufferOffset * fftSize * dataSize)
-                target?.copyMemory(from: self.fftBuffer, byteCount: dataSize * fftSize)
+                self.bufferOffset -= 1
+                if self.bufferOffset == -1 { self.bufferOffset = self.nBuffers - 1 }
+                self.audioData?.contents().assumingMemoryBound(to: Float.self).advanced(by: self.bufferOffset * self.fftSize).assign(from: self.fftBuffer, count: self.fftSize)
                 fftOffset = 0
+                DispatchQueue.main.async {
+                    if !self.inLiveResize {
+                        self.needsDisplay = true
+                    }
+                }
             }
         }
     }
@@ -134,6 +145,8 @@ class LiveAudioView: MTKView {
     
     override func draw(_ rect: CGRect) {
         super.draw(rect)
+        
+        if self.inLiveResize {return}
         
         // TODO: optimize using rect
         
@@ -159,11 +172,11 @@ class LiveAudioView: MTKView {
         commandEncoder.setRenderPipelineState(defaultPipelineState)
         // attach resources
         commandEncoder.setVertexBuffer(audioData, offset: 0, index: 0)
-        var info = [CInt(nBuffers), CInt(self.fftSize), CInt(self.lastBufferOffset)]
-        commandEncoder.setVertexBytes(&info, length: MemoryLayout<CInt>.stride * 3, index: 1)
-        commandEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 2 * self.fftSize, instanceCount: self.nBuffers - 1)
-//        commandEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3, instanceCount: 1)
+        let info = [CInt(self.nBuffers-1), CInt(self.fftSize), CInt(self.bufferOffset)]
+        commandEncoder.setVertexBytes(info, length: MemoryLayout<CInt>.stride * 3, index: 1)
+        commandEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 2 * self.fftSize, instanceCount: self.nBuffers - 2)
         // finish waveform render pass encoding
+        commandEncoder.setFrontFacing(.clockwise)
         commandEncoder.endEncoding()
         
         

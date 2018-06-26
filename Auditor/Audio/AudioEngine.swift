@@ -16,9 +16,8 @@ class AudioEngine: AVAudioEngine {
         super.init()
         
         do {
-            let url = Bundle.main.url(forResource: "claire-mid", withExtension: "aif")!
-            let file = try AVAudioFile(forReading: url)
-
+//            let url = Bundle.main.url(forResource: "claire-mid", withExtension: "aif")!
+//            let file = try AVAudioFile(forReading: url)
 //            self.attach(player)
 //            self.connect(self.player, to: self.mainMixerNode, format: file.processingFormat)
 //            player.scheduleFile(file, at: nil, completionCallbackType: .dataPlayedBack, completionHandler: nil)

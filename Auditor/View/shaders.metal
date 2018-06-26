@@ -39,26 +39,22 @@ fragment float4 vertex_color(Vertex v [[stage_in]]) {
 vertex Vertex spectrogram(const device float *audio [[ buffer(0) ]],
                           const device int *info [[ buffer(1) ]],
                           unsigned int vid [[vertex_id]],
-                          unsigned int iid [[instance_id]]){
+                          unsigned int iid [[instance_id]]) {
     int nBuffers = info[0];
     int bufferSize = info[1];
-    int bufferStart = info[2];
+    int bufferStart = info[2] + 1;
 
-    float x = float(nBuffers - 2 - iid + (vid % 2)) / (nBuffers - 1) * 2.0 - 1;
-    float y = (vid / 2) / float(bufferSize - 1) * 2.0 - 1;
+    float x = float(iid + (vid % 2)) / float(nBuffers - 1) * 2.0 - 1.0;
+    float y = float(vid / 2) / float(bufferSize - 1) * 2.0 - 1;
 
-    int audioI = bufferStart;
-    if (vid % 2 == 0) audioI += 1;
-    if (audioI == nBuffers) audioI -= nBuffers;
+    int currentBufferI = bufferStart + iid;
+    if (currentBufferI >= nBuffers) currentBufferI -= nBuffers;
+    int audioI = (currentBufferI + (vid % 2)) * bufferSize;
     audioI += (vid / 2);
-    float shade = 100*audio[audioI];
+    float shade = 1-audio[audioI];
 
     Vertex v;
-    v.position = float4(x, y, 0, 1);
+    v.position = float4(-x, -y, 0, 1);
     v.color = float4(shade, shade, shade, 1);
     return v;
-//    Vertex v;
-//    v.position = float4(int(vid) - 1, vid == 1 ? 1 : -1, 0, 1);
-//    v.color = float4(vid/2.0, vid/2.0, vid/2.0, 1);
-//    return v;
 }

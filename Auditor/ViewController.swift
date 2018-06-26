@@ -16,6 +16,15 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        var data: [Float] = [Float](repeating: 0, count: 2048)
+        for i in 0..<data.count {
+            data[i] = sin(2*Float.pi*5000/48000*Float(i))
+        }
+        let fft = FFT(nFrames: data.count)
+        let power = fft.powerSpectrum(data: data)
+        let maxI = power.index(of: power.max()!)!
+        let freqPeak = Float(maxI) / Float(power.count) * 24000
+        
         AudioRoute.onDevicesChanged = {
             self.inputTable.reloadData()
             self.outputTable.reloadData()
