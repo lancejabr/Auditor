@@ -11,35 +11,22 @@ import AVFoundation
 
 class ViewController: NSViewController {
     
+    var isRecording = false
     var audioEngine = AudioEngine()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        var data: [Float] = [Float](repeating: 0, count: 2048)
-//        for i in 0..<data.count {
-//            data[i] = sin(2*Float.pi*5000/48000*Float(i))
-//        }
-//        let fft = FFT(nFrames: data.count)
-//        let power = fft.process(data: data)
-//        let maxI = power.index(of: power.max()!)!
-//        let freqPeak = Float(maxI) / Float(power.count) * 24000
+        setTableSelection()
         
         AudioRoute.onDevicesChanged = {
             self.inputTable.reloadData()
             self.outputTable.reloadData()
             self.setTableSelection()
             self.audioEngine = AudioEngine()
-            self.audioEngine.inputNode.installTap(onBus: 0, bufferSize: AVAudioFrameCount(self.inputAudioView.fftSize), format: nil) { buffer, time in
-                self.inputAudioView.addAudioData(buffer)
-            }
         }
         
-        
-        setTableSelection()
-        self.audioEngine.inputNode.installTap(onBus: 0, bufferSize: AVAudioFrameCount(self.inputAudioView.fftSize), format: nil) { buffer, time in
-            self.inputAudioView.addAudioData(buffer)
-        }
+
     }
 
     override var representedObject: Any? {
@@ -51,8 +38,8 @@ class ViewController: NSViewController {
     @IBOutlet var inputTable: NSTableView!
     @IBOutlet var outputTable: NSTableView!
     
-    @IBOutlet var inputAudioView: LiveAudioView!
-    @IBOutlet var outputAudioView: LiveAudioView!
+    @IBOutlet var inputAudioView: SpectrogramView!
+    @IBOutlet var outputAudioView: SpectrogramView!
 
     fileprivate func setTableSelection() {
         let inputI = AudioRoute.availableInputs.index(of: AudioRoute.currentInput)
@@ -60,6 +47,24 @@ class ViewController: NSViewController {
         
         let outputI = AudioRoute.availableOutputs.index(of: AudioRoute.currentOutput)
         outputTable.selectRowIndexes(IndexSet(integer: outputI!), byExtendingSelection: false)
+    }
+    
+    override func keyDown(with event: NSEvent) {
+        switch event.characters {
+        case " ":
+            // start or stop recording
+            self.audioEngine.playthroughVolume = self.audioEngine.playthroughVolume == 0 ? 1 : 0
+            if self.audioEngine.playthroughVolume == 0 {
+                self.audioEngine.inputNode.installTap(onBus: 0, bufferSize: AVAudioFrameCount(self.inputAudioView.internalFrameLength), format: nil) { buffer, time in
+                    self.inputAudioView.addAudioData(buffer)
+                }
+            } else {
+                self.audioEngine.inputNode.removeTap(onBus: 0)
+            }
+            break
+        default:
+            break
+        }
     }
 }
 
@@ -92,29 +97,5 @@ extension ViewController: NSTableViewDelegate, NSTableViewDataSource {
         if tableView === outputTable {
             AudioRoute.currentOutput = table[row]
         }
-        
-//        if row > 0 {
-//            component = playEngine.availableAudioUnits[row-1]
-//            showCustomViewButton.isEnabled = true
-//        } else {
-//            component = nil
-//            showCustomViewButton.isEnabled = false
-//        }
-        
-//        if tableView === effectTable {
-//            self.closeAUView()
-//            let row = tableView.selectedRow
-//            let component: AVAudioUnitComponent?
-//
-//            if row > 0 {
-//                component = playEngine.availableAudioUnits[row-1]
-//                showCustomViewButton.isEnabled = true
-//            } else {
-//                component = nil
-//                showCustomViewButton.isEnabled = false
-//            }
-//
-//            playEngine.selectAudioUnitComponent(component, completionHandler: {})
-//        }
     }
 }

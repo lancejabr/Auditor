@@ -22,15 +22,29 @@ class AudioEngine: AVAudioEngine {
 //            self.connect(self.player, to: self.mainMixerNode, format: file.processingFormat)
 //            player.scheduleFile(file, at: nil, completionCallbackType: .dataPlayedBack, completionHandler: nil)
             
-
             self.connect(self.inputNode, to: self.mainMixerNode, format: nil)
-
+            self.inputNode.destination(forMixer: self.mainMixerNode, bus: 0)?.volume = 0
 
             try self.start()
 //            player.play()
 
         } catch {
             fail(desc: "Could not start audio engine!")
+        }
+    }
+    
+    var isRecording = false {
+        didSet {
+            if self.isRecording == oldValue { return }
+            if self.isRecording {
+                
+            }
+        }
+    }
+    
+    var playthroughVolume: Float = 0.0 {
+        didSet {
+            self.inputNode.destination(forMixer: self.mainMixerNode, bus: 0)?.volume = self.playthroughVolume
         }
     }
     

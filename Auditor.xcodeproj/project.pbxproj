@@ -36,6 +36,9 @@
 		7556EE9420E1FA8A002529DD /* FFT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556EE9320E1FA8A002529DD /* FFT.swift */; };
 		7556EE9520E1FA8A002529DD /* FFT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556EE9320E1FA8A002529DD /* FFT.swift */; };
 		7556EE9620E1FA8A002529DD /* FFT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556EE9320E1FA8A002529DD /* FFT.swift */; };
+		75CEB97920E2BB3400C58896 /* SpectrogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CEB97820E2BB3400C58896 /* SpectrogramView.swift */; };
+		75CEB97A20E2BB3400C58896 /* SpectrogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CEB97820E2BB3400C58896 /* SpectrogramView.swift */; };
+		75CEB97B20E2BB3400C58896 /* SpectrogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CEB97820E2BB3400C58896 /* SpectrogramView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +86,7 @@
 		750FB74520DF3FBD00526B50 /* AudioRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRoute.swift; sourceTree = "<group>"; };
 		750FB74C20DF6DD400526B50 /* claire-mid.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "claire-mid.aif"; sourceTree = "<group>"; };
 		7556EE9320E1FA8A002529DD /* FFT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFT.swift; sourceTree = "<group>"; };
+		75CEB97820E2BB3400C58896 /* SpectrogramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrogramView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +179,7 @@
 				750FB71A20DC42FB00526B50 /* shaders.metal */,
 				750FB72D20DCCFB400526B50 /* TracksScrollView.swift */,
 				750FB73320DF106200526B50 /* LiveAudioView.swift */,
+				75CEB97820E2BB3400C58896 /* SpectrogramView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -193,8 +198,8 @@
 			children = (
 				750FB72F20DDC6AB00526B50 /* AudioEngine.swift */,
 				750FB74520DF3FBD00526B50 /* AudioRoute.swift */,
-				750FB74C20DF6DD400526B50 /* claire-mid.aif */,
 				7556EE9320E1FA8A002529DD /* FFT.swift */,
+				750FB74C20DF6DD400526B50 /* claire-mid.aif */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
@@ -346,6 +351,7 @@
 				750FB71C20DC42FB00526B50 /* shaders.metal in Sources */,
 				750FB72E20DCCFB400526B50 /* TracksScrollView.swift in Sources */,
 				750FB72320DC552800526B50 /* AppView.swift in Sources */,
+				75CEB97920E2BB3400C58896 /* SpectrogramView.swift in Sources */,
 				7556EE9420E1FA8A002529DD /* FFT.swift in Sources */,
 				750FB71720DC42D800526B50 /* AudioSegmentView.swift in Sources */,
 				750FB6E920DC420E00526B50 /* AppDelegate.swift in Sources */,
@@ -359,6 +365,7 @@
 			files = (
 				750FB6FE20DC420E00526B50 /* AuditorTests.swift in Sources */,
 				750FB71820DC42D800526B50 /* AudioSegmentView.swift in Sources */,
+				75CEB97A20E2BB3400C58896 /* SpectrogramView.swift in Sources */,
 				750FB74A20DF69FD00526B50 /* AudioRoute.swift in Sources */,
 				750FB72420DC552800526B50 /* AppView.swift in Sources */,
 				7556EE9520E1FA8A002529DD /* FFT.swift in Sources */,
@@ -373,6 +380,7 @@
 			files = (
 				750FB70920DC420E00526B50 /* AuditorUITests.swift in Sources */,
 				750FB71920DC42D800526B50 /* AudioSegmentView.swift in Sources */,
+				75CEB97B20E2BB3400C58896 /* SpectrogramView.swift in Sources */,
 				750FB74B20DF69FE00526B50 /* AudioRoute.swift in Sources */,
 				750FB72520DC552800526B50 /* AppView.swift in Sources */,
 				7556EE9620E1FA8A002529DD /* FFT.swift in Sources */,

@@ -1,8 +1,8 @@
 //
-//  LiveWaveformView.swift
+//  SpectrogramView.swift
 //  Auditor
 //
-//  Created by Lance Jabr on 6/23/18.
+//  Created by Lance Jabr on 6/26/18.
 //  Copyright © 2018 Lance Jabr. All rights reserved.
 //
 
@@ -12,25 +12,26 @@ import MetalKit
 import AVFoundation
 
 /// A view that renders an audio signal using Metal
-class LiveAudioView: MTKView {
-
-    let fftSize: Int = 4096
-    var fftBuffer = UnsafeMutablePointer<Float>.allocate(capacity: 0)
+class SpectrogramView: MTKView {
+    
+    
+    /// MARK: Audio resources
+    
+    let internalFrameLength: Int = 2048
+    var fftBuffer: [Float] = [0]
     var fftOffset: Int = 0
+    var fft: FFT?
     
-    /// The thickness of each frame in the output spectrum
+    /// The thickness of each frame in the output spectrum.
     let pointsPerColumn: Int = 2
+    /// The number of frames in the output spectrum (changes on view resize).
+    var nFrames: Int = 0
     
-    let dataSize = MemoryLayout<Float>.stride
-    
+    /// Data to be passed to Metal for rendering, used as a circular buffer.
     var audioData: MTLBuffer?
-    var nBuffers: Int = 0
-    var bufferOffset: Int = -1
     
-    override func viewDidEndLiveResize() {
-        self.setup()
-        self.needsDisplay = true
-    }
+    /// The most *recent* frame index in `audioData`.
+    var frameOffset: Int = -1
     
     // MARK: Metal Resources
     
@@ -50,7 +51,10 @@ class LiveAudioView: MTKView {
     var transformBuffer: MTLBuffer?
     
     
-    // MARK: Instance Methods
+    override func viewDidEndLiveResize() {
+        self.setup()
+        self.needsDisplay = true
+    }
     
     func setup() {
         // setup the system device
@@ -60,7 +64,7 @@ class LiveAudioView: MTKView {
         self.colorPixelFormat = .bgra8Unorm
         self.clearColor = MTLClearColorMake(1, 1, 1, 1)
         
-//        self.preferredFramesPerSecond = 30
+        //        self.preferredFramesPerSecond = 30
         self.isPaused = true
         self.enableSetNeedsDisplay = true
         
@@ -70,7 +74,7 @@ class LiveAudioView: MTKView {
         
         // compile the shaders
         guard let defaultLibrary = self.device?.makeDefaultLibrary() else {
-            Swift.print("Error: couldn't create default Metal library")
+            fail(desc: "Couldn't create default Metal library")
             return
         }
         
@@ -82,44 +86,51 @@ class LiveAudioView: MTKView {
         self.defaultPipelineState = try? self.device!.makeRenderPipelineState(descriptor: defaultPipelineDescriptor)
         
         // allocate space for audio
-        self.nBuffers = Int(self.frame.width) / self.pointsPerColumn
-        self.audioData = self.device!.makeBuffer(length: self.dataSize * self.fftSize * nBuffers, options: .storageModeShared)
-        self.bufferOffset = self.nBuffers
+        self.nFrames = Int(self.frame.width) / self.pointsPerColumn
+        self.audioData = self.device!.makeBuffer(length:  MemoryLayout<Float>.stride * self.internalFrameLength/2 * nFrames, options: .storageModeShared)
+        self.frameOffset = self.nFrames
         
         // allocate space to perform FFT
-        self.fftBuffer.deallocate()
-        self.fftBuffer = UnsafeMutablePointer<Float>.allocate(capacity: self.fftSize)
-        self.fftBuffer.initialize(repeating: 0, count: self.fftSize)
+        self.fftBuffer = [Float](repeating: 0, count: self.internalFrameLength)
         self.fftOffset = 0
+        
+        // setup FFT processor
+        self.fft = FFT(nFrames: self.internalFrameLength)
     }
     
+    /// Call this function to add time-domain data to the view for immediate display.
+    /// - parameter buffer: An `AVAudioPCMBuffer` of audio data. Format should be non-interleaved or mono. The frameLength of `buffer` can be anything.
     func addAudioData(_ buffer: AVAudioPCMBuffer) {
         
-//        self.bufferOffset -= 1
-//        if self.bufferOffset == -1 { self.bufferOffset = self.nBuffers - 1 }
-//        let target = self.audioData?.contents().assumingMemoryBound(to: Float.self).advanced(by: self.bufferOffset * self.fftSize)
-//        target?.assign(repeating: Float(self.nBuffers - self.bufferOffset) / Float(self.nBuffers), count: self.fftSize)
-//        DispatchQueue.main.async {
-//            if !self.inLiveResize {
-//                self.needsDisplay = true
-//            }
-//        }
         if self.audioData == nil { return }
-
+        if self.fft == nil { return }
+        
         var framesLeft = Int(buffer.frameLength)
-
+        
         while framesLeft > 0 {
-            let framesToCopy = Swift.min(self.fftSize - fftOffset, framesLeft)
-            self.fftBuffer.advanced(by: fftOffset).assign(from: buffer.floatChannelData![0], count: framesToCopy)
+            // move frames to internal fft buffer
+            let framesToCopy = Swift.min(self.internalFrameLength - self.fftOffset, framesLeft)
+            let fftPtr = UnsafeMutablePointer<Float>(mutating: fftBuffer).advanced(by: fftOffset)
+            fftPtr.assign(from: buffer.floatChannelData![0], count: framesToCopy)
+            
             fftOffset += framesToCopy
             framesLeft -= framesToCopy
-
-            if fftOffset == self.fftSize {
-                // TODO: FFT ETC :)
-                self.bufferOffset -= 1
-                if self.bufferOffset == -1 { self.bufferOffset = self.nBuffers - 1 }
-                self.audioData?.contents().assumingMemoryBound(to: Float.self).advanced(by: self.bufferOffset * self.fftSize).assign(from: self.fftBuffer, count: self.fftSize)
+            
+            // when fft buffer is full...
+            if fftOffset == self.internalFrameLength {
+                
+                // ...process the DFT...
+                self.fft!.process(data: self.fftBuffer)
+                
+                /// ...and transfter to Metal buffer
+                self.frameOffset -= 1
+                if self.frameOffset == -1 { self.frameOffset = self.nFrames - 1 }
+                self.audioData?.contents().assumingMemoryBound(to: Float.self).advanced(by: self.frameOffset * self.internalFrameLength/2).assign(from: self.fft!.powerSpectrum, count: self.internalFrameLength/2)
+                
+                // reset for next fft
                 fftOffset = 0
+                
+                // redraw the view
                 DispatchQueue.main.async {
                     if !self.inLiveResize {
                         self.needsDisplay = true
@@ -131,24 +142,21 @@ class LiveAudioView: MTKView {
     
     required init(frame: NSRect) {
         super.init(frame: frame, device: nil)
-
+        
         self.setup()
     }
-
+    
     required init(coder: NSCoder) {
         super.init(coder: coder)
-
+        
         self.setup()
     }
-
+    
     
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
         if self.inLiveResize {return}
-        
-        // TODO: optimize using rect
-        
         
         // if something's up with Metal we can't do anything
         guard
@@ -158,34 +166,28 @@ class LiveAudioView: MTKView {
             let defaultPipelineState = self.defaultPipelineState,
             let audioData = self.audioData
             else {
-                fail(desc: "Metal is not set up properly")
+//                fail(desc: "Metal is not set up properly")
                 return
         }
         
-        
-        // create the command buffer
+        // prepare the command buffer and command encoder
         let commandBuffer = device.makeCommandQueue()!.makeCommandBuffer()!
-        
-        // 1 - encode a rendering pass for the waveform
         let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
         commandEncoder.setRenderPipelineState(defaultPipelineState)
+        
         // attach resources
-        commandEncoder.setVertexBuffer(audioData, offset: 0, index: 0)
-        let info = [CInt(self.nBuffers-1), CInt(self.fftSize), CInt(self.bufferOffset)]
+        let info = [CInt(self.nFrames-1), CInt(self.internalFrameLength/2), CInt(self.frameOffset)]
         commandEncoder.setVertexBytes(info, length: MemoryLayout<CInt>.stride * 3, index: 1)
-        commandEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 2 * self.fftSize, instanceCount: self.nBuffers - 2)
+        commandEncoder.setVertexBuffer(audioData, offset: 0, index: 0)
+        
+        // draw the spectrogram
+        commandEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: self.internalFrameLength, instanceCount: self.nFrames - 2)
+        
         // finish waveform render pass encoding
-        commandEncoder.setFrontFacing(.clockwise)
         commandEncoder.endEncoding()
-        
-        
         
         // commit the buffer for rendering
         commandBuffer.present(currentDrawable)
         commandBuffer.commit()
     }
-}
-
-protocol AudioSegmentViewDelegate {
-    
 }
