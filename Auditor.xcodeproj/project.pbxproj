@@ -42,6 +42,8 @@
 		75CEB97920E2BB3400C58896 /* SpectrogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CEB97820E2BB3400C58896 /* SpectrogramView.swift */; };
 		75CEB97A20E2BB3400C58896 /* SpectrogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CEB97820E2BB3400C58896 /* SpectrogramView.swift */; };
 		75CEB97B20E2BB3400C58896 /* SpectrogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75CEB97820E2BB3400C58896 /* SpectrogramView.swift */; };
+		75D3669620F401BE005ADC91 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB6E820DC420E00526B50 /* AppDelegate.swift */; };
+		75D3669720F401BF005ADC91 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750FB6E820DC420E00526B50 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -377,6 +379,7 @@
 				7556EE9520E1FA8A002529DD /* FFT.swift in Sources */,
 				7506EBD620EBFDC7002ABEF6 /* Windower.swift in Sources */,
 				750FB73520DF106200526B50 /* LiveAudioView.swift in Sources */,
+				75D3669620F401BE005ADC91 /* AppDelegate.swift in Sources */,
 				750FB71D20DC42FB00526B50 /* shaders.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -393,6 +396,7 @@
 				7556EE9620E1FA8A002529DD /* FFT.swift in Sources */,
 				7506EBD720EBFDC7002ABEF6 /* Windower.swift in Sources */,
 				750FB73620DF106200526B50 /* LiveAudioView.swift in Sources */,
+				75D3669720F401BF005ADC91 /* AppDelegate.swift in Sources */,
 				750FB71E20DC42FB00526B50 /* shaders.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

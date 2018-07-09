@@ -17,8 +17,9 @@ class SpectrogramView: MTKView {
     
     /// MARK: Audio resources
     
-    let internalFrameLength: Int = 2048
-    let fftLength: Int = 8192
+    let internalFrameLength: Int = 4096
+    let overlap = 0
+    let fftLength: Int = 4096
     var fftBuffer: [Float] = [0]
     var fftOffset: Int = 0
     var fft: FFT?
@@ -31,7 +32,7 @@ class SpectrogramView: MTKView {
     /// Data to be passed to Metal for rendering, used as a circular buffer.
     var audioData: MTLBuffer?
     
-    /// The most *recent* frame index in `audioData`.
+    /// The most recent frame index in `audioData`.
     var frameOffset: Int = -1
     
     // MARK: Metal Resources
@@ -65,7 +66,7 @@ class SpectrogramView: MTKView {
         self.colorPixelFormat = .bgra8Unorm
         self.clearColor = MTLClearColorMake(1, 1, 1, 1)
         
-        //        self.preferredFramesPerSecond = 30
+        self.preferredFramesPerSecond = 60
         self.isPaused = true
         self.enableSetNeedsDisplay = true
         
@@ -114,7 +115,7 @@ class SpectrogramView: MTKView {
             let framesToCopy = Swift.min(self.internalFrameLength - self.fftOffset, framesLeft)
             let fftPtr = UnsafeMutablePointer<Float>(mutating: self.fftBuffer).advanced(by: fftOffset)
             fftPtr.assign(from: buffer.floatChannelData![0], count: framesToCopy)
-            
+
             fftOffset += framesToCopy
             framesLeft -= framesToCopy
             
@@ -129,15 +130,18 @@ class SpectrogramView: MTKView {
                 if self.frameOffset == -1 { self.frameOffset = self.nFrames - 1 }
                 self.audioData?.contents().assumingMemoryBound(to: Float.self).advanced(by: self.frameOffset * self.internalFrameLength/2).assign(from: self.fft!.powerSpectrum, count: self.internalFrameLength/2)
                 
-                // reset for next fft
-                fftOffset = 0
-                
                 // redraw the view
                 DispatchQueue.main.async {
                     if !self.inLiveResize {
                         self.needsDisplay = true
                     }
                 }
+                
+                // reset for next fft
+                fftOffset = overlap
+                
+                // move data over
+                self.fftBuffer[0..<overlap] = self.fftBuffer[(self.internalFrameLength - self.overlap)..<self.internalFrameLength]
             }
         }
     }
@@ -154,7 +158,8 @@ class SpectrogramView: MTKView {
         self.setup()
     }
     
-    
+    var info = [CInt](repeating: 0, count: 3)
+
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
@@ -178,7 +183,9 @@ class SpectrogramView: MTKView {
         commandEncoder.setRenderPipelineState(defaultPipelineState)
         
         // attach resources
-        let info = [CInt(self.nFrames-1), CInt(self.internalFrameLength/2), CInt(self.frameOffset)]
+        info[0] = CInt(self.nFrames-1)
+        info[1] = CInt(self.internalFrameLength/2)
+        info[2] = CInt(self.frameOffset)
         commandEncoder.setVertexBytes(info, length: MemoryLayout<CInt>.stride * 3, index: 1)
         commandEncoder.setVertexBuffer(audioData, offset: 0, index: 0)
         
