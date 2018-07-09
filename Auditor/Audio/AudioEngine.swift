@@ -22,7 +22,8 @@ class AudioEngine: AVAudioEngine {
 //            self.connect(self.player, to: self.mainMixerNode, format: file.processingFormat)
 //            player.scheduleFile(file, at: nil, completionCallbackType: .dataPlayedBack, completionHandler: nil)
             
-            self.connect(self.inputNode, to: self.mainMixerNode, format: nil)
+            let format = AVAudioFormat.init(commonFormat: .pcmFormatFloat32, sampleRate: 44100, channels: 1, interleaved: false)
+            self.connect(self.inputNode, to: self.mainMixerNode, format: format)
             self.inputNode.destination(forMixer: self.mainMixerNode, bus: 0)?.volume = 0
 
             try self.start()

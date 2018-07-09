@@ -54,7 +54,7 @@ class ViewController: NSViewController {
         case " ":
             // start or stop recording
             self.audioEngine.playthroughVolume = self.audioEngine.playthroughVolume == 0 ? 1 : 0
-            if self.audioEngine.playthroughVolume == 0 {
+            if self.audioEngine.playthroughVolume == 1 {
                 self.audioEngine.inputNode.installTap(onBus: 0, bufferSize: AVAudioFrameCount(self.inputAudioView.internalFrameLength), format: nil) { buffer, time in
                     self.inputAudioView.addAudioData(buffer)
                 }

@@ -18,12 +18,13 @@ class SpectrogramView: MTKView {
     /// MARK: Audio resources
     
     let internalFrameLength: Int = 2048
+    let fftLength: Int = 8192
     var fftBuffer: [Float] = [0]
     var fftOffset: Int = 0
     var fft: FFT?
     
     /// The thickness of each frame in the output spectrum.
-    let pointsPerColumn: Int = 2
+    let pointsPerColumn: Int = 6
     /// The number of frames in the output spectrum (changes on view resize).
     var nFrames: Int = 0
     
@@ -87,7 +88,7 @@ class SpectrogramView: MTKView {
         
         // allocate space for audio
         self.nFrames = Int(self.frame.width) / self.pointsPerColumn
-        self.audioData = self.device!.makeBuffer(length:  MemoryLayout<Float>.stride * self.internalFrameLength/2 * nFrames, options: .storageModeShared)
+        self.audioData = self.device!.makeBuffer(length:  MemoryLayout<Float>.stride * self.fftLength/2 * nFrames, options: .storageModeShared)
         self.frameOffset = self.nFrames
         
         // allocate space to perform FFT
@@ -95,7 +96,8 @@ class SpectrogramView: MTKView {
         self.fftOffset = 0
         
         // setup FFT processor
-        self.fft = FFT(nFrames: self.internalFrameLength)
+        self.fft = FFT(nFrames: UInt(self.internalFrameLength),
+                       zeroPad: UInt(self.fftLength - self.internalFrameLength))
     }
     
     /// Call this function to add time-domain data to the view for immediate display.
@@ -110,7 +112,7 @@ class SpectrogramView: MTKView {
         while framesLeft > 0 {
             // move frames to internal fft buffer
             let framesToCopy = Swift.min(self.internalFrameLength - self.fftOffset, framesLeft)
-            let fftPtr = UnsafeMutablePointer<Float>(mutating: fftBuffer).advanced(by: fftOffset)
+            let fftPtr = UnsafeMutablePointer<Float>(mutating: self.fftBuffer).advanced(by: fftOffset)
             fftPtr.assign(from: buffer.floatChannelData![0], count: framesToCopy)
             
             fftOffset += framesToCopy
@@ -181,8 +183,9 @@ class SpectrogramView: MTKView {
         commandEncoder.setVertexBuffer(audioData, offset: 0, index: 0)
         
         // draw the spectrogram
-        commandEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: self.internalFrameLength, instanceCount: self.nFrames - 2)
-        
+//        commandEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: self.internalFrameLength, instanceCount: self.nFrames - 2)
+        commandEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: self.fftLength * 3, instanceCount: self.nFrames)
+
         // finish waveform render pass encoding
         commandEncoder.endEncoding()
         
