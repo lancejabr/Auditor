@@ -24,11 +24,6 @@ class SpectrogramView: MTKView {
     var fftOffset: Int = 0
     var fft: FFT?
     
-    /// The thickness of each frame in the output spectrum.
-    let pointsPerColumn: Int = 6
-    /// The number of frames in the output spectrum (changes on view resize).
-    var nFrames: Int = 0
-    
     /// Data to be passed to Metal for rendering, used as a circular buffer.
     var audioData: MTLBuffer?
     
@@ -36,6 +31,12 @@ class SpectrogramView: MTKView {
     var frameOffset: Int = -1
     
     // MARK: Metal Resources
+    
+    /// The thickness of each frame in the output spectrum.
+    let pointsPerColumn: Int = 6
+    
+    /// The number of frames in the output spectrum (changes on view resize).
+    var nFrames: Int = 0
     
     /// the `pipelineState` contains the shaders for the audio signal
     var defaultPipelineState: MTLRenderPipelineState?
@@ -50,7 +51,7 @@ class SpectrogramView: MTKView {
     var borderY: MTLBuffer?
     
     /// the matrix used to scale and translate the audio waveform
-    var transformBuffer: MTLBuffer?
+//    var transformBuffer: MTLBuffer?
     
     
     override func viewDidEndLiveResize() {
@@ -128,7 +129,7 @@ class SpectrogramView: MTKView {
                 /// ...and transfter to Metal buffer
                 self.frameOffset -= 1
                 if self.frameOffset == -1 { self.frameOffset = self.nFrames - 1 }
-                self.audioData?.contents().assumingMemoryBound(to: Float.self).advanced(by: self.frameOffset * self.internalFrameLength/2).assign(from: self.fft!.powerSpectrum, count: self.internalFrameLength/2)
+                self.audioData?.contents().assumingMemoryBound(to: Float.self).advanced(by: self.frameOffset * self.fftLength/2).assign(from: self.fft!.powerSpectrum, count: self.fftLength/2)
                 
                 // redraw the view
                 DispatchQueue.main.async {
@@ -158,8 +159,7 @@ class SpectrogramView: MTKView {
         self.setup()
     }
     
-    var info = [CInt](repeating: 0, count: 3)
-
+    
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
@@ -183,15 +183,12 @@ class SpectrogramView: MTKView {
         commandEncoder.setRenderPipelineState(defaultPipelineState)
         
         // attach resources
-        info[0] = CInt(self.nFrames-1)
-        info[1] = CInt(self.internalFrameLength/2)
-        info[2] = CInt(self.frameOffset)
+        let info = [CInt(self.nFrames-1), CInt(self.fftLength/2), CInt(self.frameOffset)]
         commandEncoder.setVertexBytes(info, length: MemoryLayout<CInt>.stride * 3, index: 1)
         commandEncoder.setVertexBuffer(audioData, offset: 0, index: 0)
         
         // draw the spectrogram
-//        commandEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: self.internalFrameLength, instanceCount: self.nFrames - 2)
-        commandEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: self.fftLength * 3, instanceCount: self.nFrames)
+        commandEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: self.fftLength * 6 / 2, instanceCount: self.nFrames)
 
         // finish waveform render pass encoding
         commandEncoder.endEncoding()

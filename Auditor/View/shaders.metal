@@ -30,39 +30,62 @@ vertex Vertex xy_vertex(const device float *x_coords    [[buffer(0)]],
 /// draws a spectrogram from the provided power spectrum
 vertex Vertex spectrogram(const device float *audio [[ buffer(0) ]],
                           const device int *info [[ buffer(1) ]],
-                          unsigned int vid [[vertex_id]],
-                          unsigned int iid [[instance_id]]) {
-    // get info from *info
-    int nFrames = info[0];
-    int frameSize = info[1];
-    int frameOffset = info[2];
+                          unsigned int vertexID [[vertex_id]],
+                          unsigned int frameID [[instance_id]]) {
     
-    // square ID
-    unsigned int sqID = vid / 6;
-    // point ID in square. range:[0, 6)
-    unsigned int pid = vid % 6;
+    // get info from *info
+    int nFrames = info[0]; // number of frames (columns) in the spetrogram
+    int frameSize = info[1]; // number of bins (rows) in each frame
+    int frameOffset = info[2]; // this increases by 1 each frame so the spectrogram moves
+    
+    // each frame is a column of bins, each bin is a rectangle
+    unsigned int binID = vertexID / 6;
+    // each bin is 6 points (two triangles)
+    unsigned int pointID = vertexID % 6;
 
-    float sqW = 1.0 / float(nFrames - 1) * 2.0;
-    float x = iid * sqW - 1 + sqW * (pid % 2  == 0 ? -0.5 : 0.5);
-    float sqHDelta = sqW * (pid < 2 || pid == 5 ? 0.25 : -0.25);
-    float y = float(sqID) / float(frameSize - 1) + sqHDelta;
-    y = 0.11 * log2(y) + 1;
-    y = y * 2.0 - 1;
+    // each bin is six points:
+    //
+    // (2/4)-(3)
+    //   | \  |
+    //   |  \ |
+    //  (0)-(1/5)
+    //
+    // this way, even numbers are left, odd are right
+    
+    // make x from the frame ID
+    float x = frameID;
+    // adjust if this is the right side of the square
+    if(pointID % 2 != 0) x += 1;
+    // scale to unit space
+    x = 2.0 * x / float(nFrames - 1) - 1;
+    
+    // make y from the bin ID
+    float y = binID;
+    // adjust if this is the top side of the square
+    if (!(pointID < 2 || pointID == 5)) y += 1;
+    // scale to [0, 1]
+    y /= float(frameSize - 1);
+    // make logarithmic
+//    y = -0.5 / log10(1000.0/22050.0) * log10(y);
+    // rescale to unit space
+    y = 2.0 * y - 1;
 
-    int currentFrame = frameOffset + iid;
+    // find the intensity of this square
+    int currentFrame = frameOffset + frameID;
     if (currentFrame >= nFrames) currentFrame -= nFrames;
-    int audioI = (currentFrame) * frameSize;
-    audioI += sqID;
-    float dB = 9 * log10(audio[audioI]);
-    float shade = 1-clamp((dB + 60) / 60.0, 0.0, 1.0);
+    int audioI = currentFrame * frameSize + binID;
+    float dB = 5 * log10(audio[audioI]);
+    if(dB < -60) dB = -60;
+    dB = -dB / 60.0;
 
     Vertex v;
     v.position = float4(-x, y, 0, 1);
-    v.color = float4(1, shade, shade, 1);
+    v.color = float4(1, dB, dB, 1);
     return v;
 }
 
 /// draws a spectrogram from the provided power spectrum
+/// (old version)
 vertex Vertex spectrogram2(const device float *audio [[ buffer(0) ]],
                           const device int *info [[ buffer(1) ]],
                           unsigned int vid [[vertex_id]],
